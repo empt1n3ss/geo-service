@@ -7,12 +7,14 @@ import org.mockito.MockitoAnnotations;
 import ru.netology.entity.Country;
 import ru.netology.entity.Location;
 import ru.netology.geo.GeoService;
+import ru.netology.geo.GeoServiceImpl;
 import ru.netology.i18n.LocalizationService;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public class MessageSenderImplTest {
@@ -54,10 +56,15 @@ public class MessageSenderImplTest {
     @Test
     void test_default_locale() {
         Map<String, String> headers = new HashMap<>();
+        headers.put(MessageSenderImpl.IP_ADDRESS_HEADER, GeoServiceImpl.LOCALHOST);
+        Location location = new Location("Localhost", Country.RUSSIA, "Unknown", 0);
+        when(geoService.byIp(GeoServiceImpl.LOCALHOST)).thenReturn(location);
+        when(localizationService.locale(Country.RUSSIA)).thenReturn("Добро пожаловать");
 
         String result = messageSender.send(headers);
 
-        assertEquals("Welcome", result);
+        assertEquals("Добро пожаловать", result);
     }
+
 }
 
